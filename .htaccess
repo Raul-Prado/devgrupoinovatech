@@ -1,0 +1,48 @@
+#ocultar extensão da url
+RewriteCond %{REQUEST_FILENAME}.html -f 
+RewriteRule ^ %{REQUEST_URI}.html
+
+#redefinir a pagina index
+DirectoryIndex index.html
+
+#nega o acesso ao .htaccess
+<files .htaccess>
+    Order allow,deny
+    Deny from all
+</files>
+
+#Negar acesso as pasta
+Options -Indexes
+
+#Negar acesso a imagens
+SetEnvIf Referer nf3pinturas\.com\.br localreferer
+<FilesMatch \.(jpg|jpeg|png|gif)$>
+Order deny,allow
+Deny from all
+allow from env=localreferer
+</FilesMatch>
+
+#Negar acesso a nomes de arquivos começando com ponto(.)
+<FilesMatch "^\.">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+#Redireciona de http para https
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTP_HOST} ^nf3pinturas.com.br [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.nf3pinturas.com.br [NC]
+RewriteRule ^(.*)$ https://nf3pinturas.com/$1[L,R=301]
+</IfModule>
+
+#Um ano para arquivos de imagem
+<filesMatch ".(jpg|jpeg|png|gif|ico)$">
+Header set Cache-Control "max-age=31536000, public"
+</filesMatch>
+
+#Um mês para css e js
+<filesMatch ".(css|js)$">
+Header set Cache-Control "max-age=31536000, public"
+</filesMatch>
